@@ -136,4 +136,3 @@ streamlit run scripts/app.py
 
 ---
 
-Would you like me to also create a **`requirements.txt`** with all the dependencies (tensorflow, xgboost, lightgbm, streamlit, pandas, sklearn, etc.) so your project runs anywhere easily?
