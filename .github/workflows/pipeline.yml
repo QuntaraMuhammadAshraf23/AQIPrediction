@@ -1,15 +1,15 @@
-name: AQI Pipeline Automation
+name: run-pipeline
 
 on:
+  push:
+    branches:
+      - main
   schedule:
-    # Run feature script every hour
-    - cron: "0 * * * *"
-    # Run training script every day at midnight
-    - cron: "0 0 * * *"
-  workflow_dispatch: # allow manual trigger too
+    - cron: "0 * * * *"   # every hour for features
+    - cron: "0 0 * * *"   # every day for training
 
 jobs:
-  run-pipeline:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +19,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run feature generation script (hourly)
-        if: github.event.schedule == '0 * * * *'
+      - name: Run preprocessing script
         run: python scripts/preprocess_data.py
 
-      - name: Run training script (daily)
-        if: github.event.schedule == '0 0 * * *'
+      - name: Run training script
         run: python scripts/train_models.py
