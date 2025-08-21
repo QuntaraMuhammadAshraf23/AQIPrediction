@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run preprocessing script
-        run: python scripts/preprocess_data.py
+        run: python scripts/fetch_hourly_historical_data.py
 
       - name: Run training script
         run: python scripts/train_models.py
