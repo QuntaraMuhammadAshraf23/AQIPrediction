@@ -14,8 +14,8 @@ from dotenv import load_dotenv
 # ---------------- Page Config ----------------
 st.set_page_config(page_title="AQI Dashboard", page_icon="🌍", layout="wide")
 st_autorefresh(interval=3600000, limit=None, key="aqi_refresh")  # auto-refresh every hour
-st.title("🌍 Air Quality Index (AQI) Dashboard")
-st.markdown("Real-time Monitoring, Forecasting, and Model Evaluation (Auto-refresh hourly)")
+st.title("🌍 Air Quality Index (AQI) Dashboard By Quntara Ashraf")
+st.markdown("Real-time Monitoring, Forecasting, and Model Evaluation")
 
 # ---------------- Load Env ----------------
 load_dotenv()

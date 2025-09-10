@@ -1,22 +1,25 @@
-name: Update AQI Data and Retrain Models
+name: Auto Update AQI Data
 
 on:
   schedule:
-    - cron: "0 * * * *"   # every hour
-  workflow_dispatch:      # allow manual trigger
+    - cron: "0 * * * *"   # runs every hour
+  workflow_dispatch:       # manual trigger
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write      # ✅ allow pushing to repo
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -26,19 +29,13 @@ jobs:
       - name: Fetch latest AQI data
         run: python scripts/fetch_hourly_historical_data.py
 
-      - name: Retrain models
-        run: python scripts/train_models.py
-
-      - name: Predict next 3 days
+      - name: Train & predict AQI
         run: python scripts/predict_aqi.py
 
       - name: Commit updated data & predictions
-  run: |
-     git config --global user.name "github-actions[bot]"
-     git config --global user.email "github-actions[bot]@users.noreply.github.com"
-     git add data/ predictions/
-     git commit -m "Auto-update AQI data & predictions [skip ci]" || echo "No changes to commit"
-     git push
-    env:
-     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ predictions/
+          git commit -m "Auto-update AQI data & predictions [skip ci]" || echo "No changes to commit"
+          git push
