@@ -13,6 +13,9 @@ keras
 matplotlib
 streamlit
 streamlit-autorefresh
+seaborn
+plotly
+altair
 
 # API & environment
 requests
