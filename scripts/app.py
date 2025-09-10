@@ -23,7 +23,7 @@ st.set_page_config(page_title="AQI Dashboard", page_icon="🌍", layout="wide")
 st_autorefresh(interval=3600000, limit=None, key="aqi_refresh")  # auto-refresh every hour
 st.title("🌍 Air Quality Index (AQI) Dashboard By Quntara Ashraf")
 st.markdown("Real-time Monitoring, Forecasting, Model Evaluation and Exploratory Data Analysis of AQI")
-
+st.markdown("City: Karachi")
 # ---------------- Load Env ----------------
 load_dotenv()
 API_KEY = os.getenv("OWM_API_KEY")
