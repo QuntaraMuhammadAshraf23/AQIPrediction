@@ -1,0 +1,22 @@
+# Core libraries
+pandas
+numpy
+scikit-learn
+
+# Models
+xgboost
+lightgbm
+tensorflow
+keras
+
+# Visualization
+matplotlib
+streamlit
+streamlit-autorefresh
+
+# API & environment
+requests
+python-dotenv
+
+# Model persistence
+joblib
