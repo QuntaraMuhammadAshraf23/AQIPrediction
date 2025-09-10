@@ -3,6 +3,13 @@ import pandas as pd
 import joblib
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+import plotly.graph_objects as go
+import altair as alt
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from keras.models import load_model
 from sklearn.preprocessing import StandardScaler
 from datetime import timedelta, datetime, timezone
@@ -15,7 +22,7 @@ from dotenv import load_dotenv
 st.set_page_config(page_title="AQI Dashboard", page_icon="🌍", layout="wide")
 st_autorefresh(interval=3600000, limit=None, key="aqi_refresh")  # auto-refresh every hour
 st.title("🌍 Air Quality Index (AQI) Dashboard By Quntara Ashraf")
-st.markdown("Real-time Monitoring, Forecasting, and Model Evaluation")
+st.markdown("Real-time Monitoring, Forecasting, Model Evaluation and Exploratory Data Analysis of AQI")
 
 # ---------------- Load Env ----------------
 load_dotenv()
@@ -88,7 +95,7 @@ except Exception as e:
     st.warning(f"⚠️ Could not fetch live data: {e}")
 
 # ---------------- Sidebar Navigation ----------------
-section = st.sidebar.radio("Go to", ["Historical Data", "Forecast", "Evaluation"])
+section = st.sidebar.radio("Go to", ["Historical Data", "Forecast", "Evaluation", "EDA"])
 
 # ==================================================================
 # 📜 Historical Data
@@ -194,3 +201,88 @@ elif section == "Evaluation":
     X_test_scaled = scaler.transform(X_test).reshape((X_test.shape[0], 1, X_test.shape[1]))
     y_pred_lstm = lstm_model.predict(X_test_scaled).flatten()
     evaluate(y_test, y_pred_lstm, "LSTM")
+
+# ==================================================================
+# 🔬 Exploratory Data Analysis (EDA)
+# ==================================================================
+elif section == "EDA":
+    st.subheader("🔬 Exploratory Data Analysis (EDA)")
+
+    # Dataset overview
+    st.markdown("### 📌 Dataset Overview")
+    st.write("Shape:", df.shape)
+    st.write("Columns:", list(df.columns))
+    st.write("Missing values:", df.isnull().sum().to_dict())
+    st.dataframe(df.head())
+
+    # Statistical summary
+    st.markdown("### 📊 Statistical Summary")
+    st.dataframe(df.describe())
+
+    # Distribution of AQI
+    st.markdown("### 🌍 Distribution of AQI")
+    fig, ax = plt.subplots(figsize=(8,5))
+    sns.histplot(df["aqi"], kde=True, bins=30, color="skyblue", ax=ax)
+    ax.set_title("Distribution of AQI")
+    st.pyplot(fig)
+
+    # AQI over time
+    st.markdown("### ⏳ AQI Over Time")
+    fig, ax = plt.subplots(figsize=(15,6))
+    ax.plot(df["datetime"], df["aqi"], label="AQI", color="red")
+    ax.set_xlabel("Datetime")
+    ax.set_ylabel("AQI")
+    ax.legend()
+    st.pyplot(fig)
+
+    # Interactive pollutant trend
+    pollutants = ["pm25", "pm10", "co", "no2", "so2", "o3", "nh3"]
+    pollutant_choice = st.selectbox("Select a pollutant to visualize", pollutants)
+
+    st.markdown(f"### 💨 {pollutant_choice.upper()} Trend Over Time")
+    fig, ax = plt.subplots(figsize=(15,6))
+    ax.plot(df["datetime"], df[pollutant_choice], label=pollutant_choice, color="green")
+    ax.legend()
+    st.pyplot(fig)
+
+    # Correlation heatmap
+    st.markdown("### 🔗 Correlation Heatmap")
+    fig, ax = plt.subplots(figsize=(10,6))
+    sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f", ax=ax)
+    st.pyplot(fig)
+
+    # Time-based analysis
+    st.markdown("### 🕒 AQI Trend by Time")
+    time_option = st.radio("Select time granularity", ["Hour of Day", "Day of Week", "Month"])
+
+    if time_option == "Hour of Day":
+        fig, ax = plt.subplots(figsize=(8,5))
+        sns.lineplot(x="hour", y="aqi", data=df, ci=None, marker="o", ax=ax)
+        ax.set_title("Average AQI by Hour of Day")
+        st.pyplot(fig)
+
+    elif time_option == "Day of Week":
+        df["dayofweek"] = df["datetime"].dt.day_name()
+        fig, ax = plt.subplots(figsize=(8,5))
+        sns.barplot(x="dayofweek", y="aqi", data=df, ax=ax, order=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"])
+        ax.set_title("Average AQI by Day of Week")
+        st.pyplot(fig)
+
+    elif time_option == "Month":
+        fig, ax = plt.subplots(figsize=(8,5))
+        sns.barplot(x="month", y="aqi", data=df, ax=ax)
+        ax.set_title("Average AQI by Month")
+        st.pyplot(fig)
+
+    # Outliers detection toggle
+    if st.checkbox("🚨 Show Outlier Analysis"):
+        st.markdown("#### Boxplot of AQI")
+        fig, ax = plt.subplots(figsize=(8,5))
+        sns.boxplot(x=df["aqi"], ax=ax)
+        st.pyplot(fig)
+
+        st.markdown("#### Scatterplot of AQI Over Time")
+        fig, ax = plt.subplots(figsize=(10,5))
+        ax.scatter(df.index, df["aqi"], alpha=0.5)
+        ax.set_title("Scatterplot of AQI Over Time")
+        st.pyplot(fig)
